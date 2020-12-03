@@ -174,24 +174,43 @@ func (session *Session) exec(sqlStr string, args ...interface{}) (sql.Result, er
 		}
 	}
 
+	errProcess := func(err error) {
+		if err == nil {
+			return
+		}
+		tableName := session.statement.TableName()
+		fullSQL, err := interpolateParams(sqlStr, args)
+		if err != nil {
+			session.engine.logger.Errorf("[%s] interpolateparams error:%s(sql:%s)(args:%+v)", tableName, err, sqlStr, args)
+		} else {
+			session.engine.errLogger.Write(tableName, fullSQL)
+		}
+	}
+
 	if !session.isAutoCommit {
-		return session.tx.ExecContext(session.ctx, sqlStr, args...)
+		res, err := session.tx.ExecContext(session.ctx, sqlStr, args...)
+		errProcess(err)
+		return res, err
 	}
 
 	if session.prepareStmt {
 		stmt, err := session.doPrepare(session.DB(), sqlStr)
 		if err != nil {
+			errProcess(err)
 			return nil, err
 		}
 
 		res, err := stmt.ExecContext(session.ctx, args...)
+		errProcess(err)
 		if err != nil {
 			return nil, err
 		}
 		return res, nil
 	}
 
-	return session.DB().ExecContext(session.ctx, sqlStr, args...)
+	res, err := session.DB().ExecContext(session.ctx, sqlStr, args...)
+	errProcess(err)
+	return res, err
 }
 
 func convertSQLOrArgs(sqlOrArgs ...interface{}) (string, []interface{}, error) {

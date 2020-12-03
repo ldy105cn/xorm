@@ -55,6 +55,8 @@ type Engine struct {
 	cacherLock sync.RWMutex
 
 	defaultContext context.Context
+
+	errLogger ErrLogger
 }
 
 func (engine *Engine) setCacher(tableName string, cacher core.Cacher) {
@@ -132,6 +134,12 @@ func (engine *Engine) SetLogger(logger core.ILogger) {
 // SetLogLevel sets the logger level
 func (engine *Engine) SetLogLevel(level core.LogLevel) {
 	engine.logger.SetLevel(level)
+}
+
+// SetErrLoggerOutPut will call output write
+func (engine *Engine) SetErrLoggerOutPut(output ErrLoggerWriter) {
+	engine.errLogger.enable = true
+	engine.errLogger.output = output
 }
 
 // SetDisableGlobalCache disable global cache or not
