@@ -1,4 +1,4 @@
-module github.com/go-xorm/xorm
+module github.com/ldy105cn/xorm
 
 go 1.11
 
@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
+	github.com/sirupsen/logrus v1.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/ziutek/mymysql v1.5.4
 	xorm.io/builder v0.3.6
